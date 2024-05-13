@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dunda</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+  }
+  h2 {
+    color: #333;
+    text-align: center;
+  }
+  form {
+    max-width: 400px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  label {
+    font-weight: bold;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 10px; /* Adicionei um espaçamento abaixo do botão */
+  }
+  button[type="submit"]:hover {
+    background-color: #45a049;
+  }
+  #resultado {
+    font-size: 18px;
+    margin-top: 15px;
+    text-align: center;
+  }
+  #estadoPagamento {
+    font-size: 18px;
+    margin-top: 15px;
+    text-align: center;
+    color: #333;
+  }
+  /* Estilos para o link do WhatsApp */
+  .whatsapp-link {
+    display: block;
+    width: 200px; /* Largura do botão */
+    margin: 0 auto; /* Centralizar horizontalmente */
+    background-color: #25D366; /* Cor de fundo do botão */
+    color: #fff; /* Cor do texto do botão */
+    text-decoration: none; /* Remove sublinhado padrão */
+    padding: 10px 20px; /* Espaçamento interno do botão */
+    border-radius: 5px; /* Cantos arredondados */
+    font-size: 16px; /* Tamanho da fonte */
+    transition: background-color 0.3s; /* Transição suave de cor ao passar o mouse */
+  }
+  .whatsapp-link:hover {
+    background-color: #128C7E; /* Cor de fundo do botão ao passar o mouse */
+  }
+</style>
+</head>
+<body>
+
+<h2>Obtenha o teu código de desbloqueio do celular para ler todas redes</h2>
+
+<form id="formulario">
+  <label for="numeroImei">Digite o IMEI do celular com até 15 dígitos:</label><br>
+  <input type="text" id="numeroImei" name="numeroImei" maxlength="15"><br>
+  <button type="submit">OK</button>
+</form>
+
+<div id="paymentFormContainer" style="display: none;">
+  <h2>Confirme o Pagamento</h2>
+  <form id="confirmPaymentForm">
+      <label for="numero">Digite o número do celular:</label><br>
+      <input type="text" id="numero" name="numero" maxlength="15"><br><br>
+      <button type="submit">Confirmar Pagamento</button>
+  </form>
+</div>
+
+<p id="resultado"></p>
+<p id="estadoPagamento"></p>
+
+<h2 style="font-weight: normal;">Esta aplicação é válida apenas para celulares: Hisense, Tecno, Stylo, Itel, Movitel (M9108, M9910 e M9116)</h2>
+<h2 style="font-weight: normal;">Esta é uma promoção válida até 28 de Maio de 2024</h2>
+
+<a href="https://chat.whatsapp.com/Hjr6RRJIZPCDrdFnZqY4Mg" class="whatsapp-link">Enviar mensagem pelo WhatsApp</a>
+
+<script>
+document.getElementById("formulario").addEventListener("submit", function(event) {
+  event.preventDefault(); // Evita o envio do formulário
+
+  var numeroImei = document.getElementById("numeroImei").value;
+
+  // Verifica se o número contém apenas dígitos e se tem 15 dígitos
+  if (/^\d{1,15}$/.test(numeroImei)) {
+    // Oculta o formulário de IMEI e exibe o formulário de pagamento
+    document.getElementById("formulario").style.display = "none";
+    document.getElementById("paymentFormContainer").style.display = "block";
+  } else {
+    alert("Digite até 15 dígitos numéricos.");
+  }
+});
+
+document.getElementById("confirmPaymentForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Impede o envio do formulário padrão
+
+    // Dados para enviar
+    var payload = {
+        'carteira': '1715351739605x645998378212393000',
+        'quem comprou': 'Luis',
+        'numero': document.getElementById("numero").value,
+        'valor': '1'
+    };
+
+    // Enviar a solicitação POST com os dados usando fetch API
+    fetch("https://mozpayment.online/api/1.1/wf/pagamentorotativoemola", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(function(response) {
+        if (response.ok) {
+            document.getElementById("estadoPagamento").textContent = "Confirmado";
+            return response.json();
+        } else {
+            document.getElementById("estadoPagamento").textContent = "Pagamento não confirmado! Confirme novamente o pagamento no seu celular para receber o teu código.";
+            throw new Error("Erro: " + response.status);
+        }
+    })
+    .then(function(data) {
+        if (document.getElementById("estadoPagamento").textContent === "Confirmado") {
+            var resultado = aplicarFormula(document.getElementById("numeroImei").value);
+            document.getElementById("resultado").textContent = "O teu código é: " + resultado;
+        }
+    })
+    .catch(function(error) {
+        console.error("Erro:", error);
+    });
+});
+
+function aplicarFormula(numeroImei) {
+  var soma = [];
+  for (var i = 0; i < 14; i += 2) {
+    soma.push(parseInt(numeroImei[i]) + parseInt(numeroImei[i + 1]));
+  }
+
+  soma = soma.map(function(x) {
+    return x >= 10 ? x % 10 : x;
+  });
+
+  var resultado = soma.join("") + numeroImei[0];
+  return resultado;
+}
+</script>
+
+</body>
+</html>
